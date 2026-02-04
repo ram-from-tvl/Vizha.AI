@@ -1,0 +1,48 @@
+{
+  "name": "ai-event-management-platform",
+  "version": "1.0.0",
+  "description": "AI-powered event management platform using Tambo AI",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "db:push": "npx prisma db push",
+    "db:seed": "npx tsx src/lib/seed.ts",
+    "db:setup": "npm run db:push && npm run db:seed"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.14.0",
+    "@standard-community/standard-json": "^0.3.5",
+    "@stripe/stripe-js": "^3.3.0",
+    "@tambo-ai/react": "^0.50.0",
+    "@valibot/to-json-schema": "^1.5.0",
+    "bcryptjs": "^2.4.3",
+    "clsx": "^2.1.1",
+    "date-fns": "^3.6.0",
+    "effect": "^3.19.16",
+    "jose": "^5.3.0",
+    "lucide-react": "^0.378.0",
+    "next": "14.2.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "stripe": "^14.25.0",
+    "sury": "^10.0.4",
+    "tailwind-merge": "^2.3.0",
+    "valibot": "^1.2.0",
+    "zod": "^3.25.76",
+    "zod-to-json-schema": "^3.25.1"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20.12.12",
+    "@types/react": "^18.3.2",
+    "@types/react-dom": "^18.3.0",
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.38",
+    "prisma": "^5.14.0",
+    "tailwindcss": "^3.4.3",
+    "tsx": "^4.10.5",
+    "typescript": "^5.4.5"
+  }
+}

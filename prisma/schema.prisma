@@ -1,0 +1,201 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ORGANIZER
+  ATTENDEE
+}
+
+enum EventType {
+  HACKATHON
+  CONFERENCE
+  WORKSHOP
+  MEETUP
+}
+
+enum EventStatus {
+  DRAFT
+  PUBLISHED
+  ONGOING
+  COMPLETED
+  CANCELLED
+}
+
+enum RegistrationStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  WAITLISTED
+}
+
+enum TeamStatus {
+  FORMING
+  ACTIVE
+  SUBMITTED
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String
+  name          String
+  role          UserRole  @default(ATTENDEE)
+  avatar        String?
+  bio           String?
+  skills        String[]
+  interests     String[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  organizedEvents Event[]        @relation("OrganizerEvents")
+  registrations   Registration[]
+  teamMembers     TeamMember[]
+  votes           Vote[]
+  chatMessages    ChatMessage[]
+}
+
+model Event {
+  id              String      @id @default(cuid())
+  title           String
+  description     String
+  type            EventType
+  status          EventStatus @default(DRAFT)
+  startDate       DateTime
+  endDate         DateTime
+  location        String
+  capacity        Int
+  price           Float       @default(0)
+  currency        String      @default("USD")
+  imageUrl        String?
+  tags            String[]
+  requirements    String[]
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  // Relations
+  organizerId     String
+  organizer       User           @relation("OrganizerEvents", fields: [organizerId], references: [id])
+  registrations   Registration[]
+  teams           Team[]
+  scheduleItems   ScheduleItem[]
+  prizes          Prize[]
+  votes           Vote[]
+  chatMessages    ChatMessage[]
+}
+
+model Registration {
+  id              String             @id @default(cuid())
+  status          RegistrationStatus @default(PENDING)
+  teamPreference  String?
+  skills          String[]
+  motivation      String?
+  specialRequests String?
+  paymentId       String?
+  paidAt          DateTime?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  // Relations
+  userId    String
+  user      User   @relation(fields: [userId], references: [id])
+  eventId   String
+  event     Event  @relation(fields: [eventId], references: [id])
+
+  @@unique([userId, eventId])
+}
+
+model Team {
+  id          String     @id @default(cuid())
+  name        String
+  status      TeamStatus @default(FORMING)
+  projectName String?
+  projectDesc String?
+  githubUrl   String?
+  demoUrl     String?
+  technologies String[]
+  submittedAt DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // Relations
+  eventId   String
+  event     Event        @relation(fields: [eventId], references: [id])
+  members   TeamMember[]
+}
+
+model TeamMember {
+  id        String   @id @default(cuid())
+  role      String   @default("member")
+  joinedAt  DateTime @default(now())
+
+  // Relations
+  teamId  String
+  team    Team   @relation(fields: [teamId], references: [id])
+  userId  String
+  user    User   @relation(fields: [userId], references: [id])
+
+  @@unique([teamId, userId])
+}
+
+model ScheduleItem {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  startTime   DateTime
+  endTime     DateTime
+  location    String?
+  speaker     String?
+  order       Int      @default(0)
+
+  // Relations
+  eventId String
+  event   Event  @relation(fields: [eventId], references: [id])
+}
+
+model Prize {
+  id          String @id @default(cuid())
+  rank        Int
+  title       String
+  description String
+  value       Float
+  currency    String @default("USD")
+
+  // Relations
+  eventId String
+  event   Event  @relation(fields: [eventId], references: [id])
+}
+
+model Vote {
+  id        String   @id @default(cuid())
+  voteType  String
+  optionId  String
+  createdAt DateTime @default(now())
+
+  // Relations
+  userId  String
+  user    User   @relation(fields: [userId], references: [id])
+  eventId String
+  event   Event  @relation(fields: [eventId], references: [id])
+
+  @@unique([userId, eventId, voteType])
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  content   String
+  channel   String   @default("general")
+  createdAt DateTime @default(now())
+
+  // Relations
+  userId  String
+  user    User   @relation(fields: [userId], references: [id])
+  eventId String
+  event   Event  @relation(fields: [eventId], references: [id])
+}
