@@ -7,4 +7,3 @@ export { PrizeDisplay } from './PrizeDisplay';
 export { ParticipantList } from './ParticipantList';
 export { EventCalendar } from './EventCalendar';
 export { EventAnalytics } from './EventAnalytics';
-export { ChatRoom } from './ChatRoom';

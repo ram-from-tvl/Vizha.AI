@@ -13,7 +13,6 @@ import { PrizeDisplay } from './tambo/PrizeDisplay';
 import { ParticipantList } from './tambo/ParticipantList';
 import { EventCalendar } from './tambo/EventCalendar';
 import { EventAnalytics } from './tambo/EventAnalytics';
-import { ChatRoom } from './tambo/ChatRoom';
 
 // Define Tambo components with Zod schemas
 const tamboComponents = [
@@ -93,16 +92,6 @@ const tamboComponents = [
     propsSchema: z.object({
       eventId: z.string().optional().describe('Specific event ID or leave empty for all events'),
       organizerId: z.string().optional().describe('Organizer ID'),
-    }),
-  },
-  {
-    name: 'ChatRoom',
-    description: 'Real-time chat room for event participants to communicate. Use when user wants to chat with other participants.',
-    component: ChatRoom,
-    propsSchema: z.object({
-      eventId: z.string().describe('The event ID'),
-      userId: z.string().optional().describe('Current user ID'),
-      userName: z.string().optional().describe('Current user name'),
     }),
   },
 ];

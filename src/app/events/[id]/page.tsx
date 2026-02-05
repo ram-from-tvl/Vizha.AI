@@ -7,7 +7,6 @@ import { EventSchedule } from '@/components/tambo/EventSchedule';
 import { PrizeDisplay } from '@/components/tambo/PrizeDisplay';
 import { ParticipantList } from '@/components/tambo/ParticipantList';
 import { TeamMatcher } from '@/components/tambo/TeamMatcher';
-import { ChatRoom } from '@/components/tambo/ChatRoom';
 
 interface Event {
   id: string;
@@ -66,7 +65,7 @@ export default function EventDetailPage() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'overview' | 'schedule' | 'participants' | 'teams' | 'chat'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'schedule' | 'participants' | 'teams'>('overview');
   const [registering, setRegistering] = useState(false);
   const [isRegistered, setIsRegistered] = useState(false);
   const [showRegModal, setShowRegModal] = useState(false);
@@ -350,7 +349,7 @@ export default function EventDetailPage() {
         <div className="lg:col-span-2 space-y-8">
           {/* Tabs */}
           <div className="flex gap-2 overflow-x-auto pb-2">
-            {['overview', 'schedule', 'participants', 'teams', 'chat'].map(tab => (
+            {['overview', 'schedule', 'participants', 'teams'].map(tab => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab as any)}
@@ -398,10 +397,6 @@ export default function EventDetailPage() {
 
           {activeTab === 'teams' && event.type === 'HACKATHON' && (
             <TeamMatcher eventId={eventId} />
-          )}
-
-          {activeTab === 'chat' && (
-            <ChatRoom eventId={eventId} />
           )}
         </div>
 
