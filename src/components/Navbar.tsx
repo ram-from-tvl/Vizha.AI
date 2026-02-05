@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -17,10 +17,28 @@ export function Navbar() {
   const [isLoading, setIsLoading] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchUser();
   }, []);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Close menu on route change
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
 
   const fetchUser = async () => {
     try {
@@ -102,7 +120,7 @@ export function Navbar() {
             {isLoading ? (
               <div className="h-8 w-20 bg-gray-200 animate-pulse rounded"></div>
             ) : user ? (
-              <div className="relative">
+              <div className="relative" ref={menuRef}>
                 <button
                   onClick={() => setMenuOpen(!menuOpen)}
                   className="flex items-center space-x-2 bg-gray-100 hover:bg-gray-200 rounded-full pl-2 pr-4 py-1 transition-colors"
@@ -114,37 +132,78 @@ export function Navbar() {
                       user.name.charAt(0).toUpperCase()
                     )}
                   </div>
-                  <span className="text-sm font-medium text-gray-700">{user.name}</span>
-                  <span className={`text-xs px-2 py-0.5 rounded-full ${
+                  <span className="text-sm font-medium text-gray-700 hidden sm:inline">{user.name}</span>
+                  <span className={`text-xs px-2 py-0.5 rounded-full hidden md:inline ${
                     user.role === 'ORGANIZER' ? 'bg-purple-100 text-purple-700' : 'bg-green-100 text-green-700'
                   }`}>
                     {user.role === 'ORGANIZER' ? '🎯 Organizer' : '👤 Attendee'}
                   </span>
+                  <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={menuOpen ? "M5 15l7-7 7 7" : "M19 9l-7 7-7-7"} />
+                  </svg>
                 </button>
 
                 {menuOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
-                    <Link
-                      href="/dashboard"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      onClick={() => setMenuOpen(false)}
-                    >
-                      Dashboard
-                    </Link>
-                    <Link
-                      href="/profile"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      onClick={() => setMenuOpen(false)}
-                    >
-                      Profile
-                    </Link>
-                    <hr className="my-1" />
-                    <button
-                      onClick={handleLogout}
-                      className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                    >
-                      Logout
-                    </button>
+                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 z-50 border border-gray-200">
+                    {/* User Info Header */}
+                    <div className="px-4 py-3 border-b border-gray-100">
+                      <p className="text-sm font-semibold text-gray-900">{user.name}</p>
+                      <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                    </div>
+                    
+                    {/* Navigation Links */}
+                    <div className="py-1">
+                      <Link
+                        href="/dashboard"
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        <span>📊</span> Dashboard
+                      </Link>
+                      <Link
+                        href="/profile"
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        <span>👤</span> My Profile
+                      </Link>
+                      <Link
+                        href="/my-registrations"
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        <span>🎟️</span> My Registrations
+                      </Link>
+                      {user.role === 'ORGANIZER' && (
+                        <>
+                          <hr className="my-1" />
+                          <Link
+                            href="/events/create"
+                            className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            onClick={() => setMenuOpen(false)}
+                          >
+                            <span>➕</span> Create Event
+                          </Link>
+                          <Link
+                            href="/dashboard"
+                            className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            onClick={() => setMenuOpen(false)}
+                          >
+                            <span>📈</span> My Events
+                          </Link>
+                        </>
+                      )}
+                    </div>
+                    
+                    {/* Logout */}
+                    <div className="border-t border-gray-100 pt-1">
+                      <button
+                        onClick={handleLogout}
+                        className="flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                      >
+                        <span>🚪</span> Logout
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
